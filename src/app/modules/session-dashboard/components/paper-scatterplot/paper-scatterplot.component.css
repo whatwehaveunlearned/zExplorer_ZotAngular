@@ -1,0 +1,28 @@
+::ng-deep #tooltip_title{
+    font-size:1.1em;
+  }
+  
+  button{
+      float: right;
+      z-index: 10;
+      position: relative;
+  }
+  
+  #paper_scatterplot_card{
+      overflow: hidden;
+      background:#001025;
+      padding: 0px;
+      padding-top: 15px;
+  }
+  
+  ::ng-deep .axis line{
+      stroke: #FFFFFF;
+    }
+    
+  ::ng-deep  .axis path{
+      stroke: #FFFFFF;
+    }
+    
+  ::ng-deep  .axis text{
+      stroke: #FFFFFF;
+    }  

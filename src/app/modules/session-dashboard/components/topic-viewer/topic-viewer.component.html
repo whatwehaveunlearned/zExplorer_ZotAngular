@@ -1,0 +1,71 @@
+<div>
+<div class='title' fxLayout="row" fxLayoutAlign='center'>
+    <p style='color:#43EFC4;'>Topics</p>
+</div>
+<mat-card id="container" fxLayout="row"  fxLayoutGap="2px" cdkDropList cdkDropListOrientation="vertical" class="list" (cdkDropListDropped)="drop($event)">
+  <div class="example-custom-placeholder" *cdkDragPlaceholder></div>
+  <mat-card class = "{{'topicCard'}}" id = "{{'topicCard-' + topic.id}}" (dblclick) = "mouseClick(topic,$event)" (mouseenter) = "mouseEnter(topic)" (mouseleave) = "mouseOut(topic)" class="card" fxFlex *ngFor = "let topic of topic_list" cdkDrag [style.visibility]="topic.visibility">
+    <div class='card_header'>
+      <span fxLayoutAlign="center stretch">
+          <button mat-button (click) = "increaseWeight(topic,$event)">
+            <mat-icon>thumb_up</mat-icon>
+          </button>
+          <button mat-button (click) = "decreaseWeight(topic,$event)">
+              <mat-icon>thumb_down</mat-icon>
+            </button>
+          <button mat-button (click) = "editLabel(topic,$event)">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-button (click) = "deleteTopic(topic,$event)">
+              <mat-icon>close</mat-icon>
+          </button>
+      </span>
+    </div>
+    <div fxLayout="row" *ngIf="topic.isLabelBeingEdited">
+      <mat-form-field class="label-chip-list">
+        <mat-chip-list #chipList>
+          <mat-chip *ngFor="let label of topic.labels" [selectable]="selectable" [color]="warn"
+                   [removable]="removable" (removed)="remove(label,topic)">
+            {{label.name}}
+            <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+          </mat-chip>
+          <input placeholder="Tags"
+                 [matChipInputFor]="chipList"
+                 [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                 [matChipInputAddOnBlur]="addOnBlur"
+                 (matChipInputTokenEnd)="add($event,topic)">
+        </mat-chip-list>
+      </mat-form-field>
+    </div>
+      <mat-card-content>
+        <mat-accordion>
+          <mat-expansion-panel class="panel">
+              <mat-expansion-panel-header class="panel_header" [collapsedHeight]="'27px'">
+                <mat-panel-title class="topic_name">
+                    {{ topic.labels[0].name}}
+                </mat-panel-title>
+                <mat-panel-description class="topic_weight">
+                    {{ topic.weight | number: '1.0-0'}}
+                </mat-panel-description>
+              </mat-expansion-panel-header>
+                <ul>
+                  <li fxLayout="row" *ngFor = "let each of topic.words" [style.color] = "each.exemplar ? '#43EFC4' : 'white'">
+                    {{each.word}}
+                    <span class="example-spacer"></span> 
+                    <span fxLayoutAlign="right"> 
+                        <button mat-button (click) = "toogleExemplar(each,$event)">
+                            <mat-icon *ngIf= "each.exemplar">thumb_down</mat-icon>
+                            <mat-icon *ngIf= "each.exemplar==false">thumb_up</mat-icon>
+                        </button>
+                        <button mat-button (click) = "deleteWord(each,$event)">
+                            <mat-icon>delete</mat-icon>
+                        </button>
+                    </span>
+                  </li>
+                </ul>
+          </mat-expansion-panel>
+        </mat-accordion>
+      </mat-card-content>
+  </mat-card>
+</mat-card>
+</div>

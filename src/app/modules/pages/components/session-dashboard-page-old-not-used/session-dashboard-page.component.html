@@ -1,0 +1,30 @@
+<app-navbar></app-navbar>
+<section id='container'>
+    <!-- <section *ngIf="isVisible" id='first_col'>
+      <mat-card>
+          <div class='card_header'>
+              <ul fxLayout fxLayoutGap="10px" class="nav-items">
+                  <li ><a style='color:#43EFC4;'>Papers</a></li>
+                  <li><a>Authors</a></li>
+              </ul>
+              <span class="example-spacer"></span>
+                  <button color="primary" mat-button (click) = "hideColumn()">
+                      <mat-icon>chevron_left</mat-icon>
+              </button>
+            </div> 
+      </mat-card>
+      <app-paper-list id="app-paper-list"></app-paper-list>
+      <app-author-list id="app-author-list"></app-author-list>
+    </section> -->
+    <!-- <section id='small_drawer_opener' *ngIf="!isVisible">
+        <button color="primary" mat-button (click) = "hideColumn()">
+            <mat-icon>chevron_right</mat-icon>s
+        </button>
+      </section> -->
+    <section id='second_col'>
+      <app-scatterplot id="scatterplot"></app-scatterplot>
+    </section>
+    <section id='third_col'>
+        <app-topic-viewer id="topic-viewer"></app-topic-viewer>
+      </section>
+</section>

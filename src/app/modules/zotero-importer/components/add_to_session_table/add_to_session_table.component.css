@@ -1,0 +1,66 @@
+.table{
+    margin: 10px;
+    padding:2px;
+}
+
+.mat-cell{
+    font-size:0.6em;
+}
+
+mat-card{
+    height: 546px;
+    overflow-y:scroll;
+    background-color:#3c3a3a;
+    padding: 0px;
+    background: #3c3a3a;
+}
+
+.mat-header-cell{
+    background-color:#3c3a3a;
+    color:white;
+    padding-right: 10px;
+}
+
+
+.mat-cell{
+    border-color:white;
+    background-color:#3c3a3a;
+    color:white;
+}
+
+.table{
+    margin-top: 6px;
+    color:white;
+}
+
+td.mat-cell:first-of-type{
+    padding: 0px;
+    padding-left: 9px;
+    padding-right: 9px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+td.mat-cell:last-of-type{
+    padding: 6px;
+}
+
+/* width */
+::-webkit-scrollbar {
+    width: 5px;
+  }
+  
+  /* Track */
+  ::-webkit-scrollbar-track-piece{
+    background: #3c3a3a; 
+  }
+  
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background: #43EFC4; 
+  }
+  
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background: #43EFC4; 
+  }

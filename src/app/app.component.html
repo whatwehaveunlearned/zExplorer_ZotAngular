@@ -1,0 +1,16 @@
+<app-navbar></app-navbar>
+<mat-toolbar color="primary">
+    <mat-toolbar-row>
+        <span><h1>Zexplorer</h1></span>
+        <span><button (click) = "searchArxiv()" mat-button > Search Arxiv </button></span>
+        <span><button (click) = "updateModel()" mat-button > Update Model </button></span>
+       <span class="example-spacer"></span>
+       <ul fxLayout fxLayoutGap="10px" class="nav-items">
+        <li><a routerLink ="/signup">Signup</a></li>
+        <li><a routerLink ="/login" [routerLinkActive]="['is-active']">Login</a></li>
+        <li><a routerLink ="/zot_importer" [routerLinkActive]="['is-active']">Import</a></li>
+        <li><a routerLink ="/dashboard" [routerLinkActive]="['is-active']">Dashboard</a></li>
+        </ul>
+    </mat-toolbar-row>
+</mat-toolbar>
+<router-outlet></router-outlet>

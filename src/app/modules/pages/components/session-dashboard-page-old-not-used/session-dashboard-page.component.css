@@ -1,0 +1,111 @@
+#container{
+    display: flex;
+    flex-direction:row;
+}
+
+#first_col{
+    display: flex;
+    height:100%;
+    flex-direction: column;
+    flex:1;
+    background-color:#3c3a3a;
+}
+
+#small_drawer_opener{
+    height:100%;
+    background-color:#3c3a3a;
+    position:relative;
+    top:235px;
+}
+
+#small_drawer_opener button{
+    height: 111px;
+    min-width: 26px;
+    padding: 0px;
+}
+
+#app-paper-list{
+    width: 100%;
+    flex:1;
+}
+
+#app-author-list{
+    width: 100%;
+    flex:1;
+}
+
+#second_col{
+    display: flex;
+    height:500px;
+    flex-direction: column;
+    flex:3;
+    background:#001025;
+}
+
+#third_col{
+    display: flex;
+    height:100%;
+    flex-direction: column;
+    flex:1;
+    background-color:#828E90;
+}
+
+#topic-viewer{
+    width: 100%;
+    flex: 1.5;
+}
+
+#scatterplot{
+    width:100%;
+    flex:1;
+    overflow: hidden;
+}
+
+a:link{
+    text-decoration:none
+}
+
+a {
+    text-decoration: none;
+    color:#828E90;
+}
+
+h1{
+    color:#828E90;
+}
+
+a:hover,
+a:active{
+    color:#43EFC4;
+}
+
+::ng-deep .activeTab{
+    color:#43EFC4;
+}
+
+.nav-items{
+    list-style: none;
+    padding:0;
+    margin:0;
+    padding-top:10px;
+}
+
+.example-spacer {
+    flex: 1 1 auto;
+}
+
+.card_header{
+    position:relative;
+    left:-4px;
+    border-bottom: 1px black solid;
+    padding-bottom:10px;
+    display: flex;
+}
+
+mat-card{
+    background-color:#3c3a3a;
+}
+
+::ng-deep .mat-card-header-text {
+    margin: 0px 0px; 
+  }

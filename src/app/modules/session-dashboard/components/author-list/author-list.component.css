@@ -1,0 +1,19 @@
+.mat-cell{
+    font-size:0.8em;
+}
+
+.table{
+    margin-top: 6px;
+    color:white;
+}
+
+.mat-header-row{
+    background-color:#3c3a3a;
+    color:white;
+}
+
+mat-card{
+    height: 255px;
+    overflow-y:scroll;
+    background-color:#3c3a3a;
+}
