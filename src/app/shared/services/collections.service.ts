@@ -249,7 +249,7 @@ export class CollectionsService {
       this.updateSubjects()
     }else if(this.response.type==='update_model'){
       //Process Papers
-      this.processPapers(this.response.message.documents);
+      this.processPapers(this.response.message.documents,this.topics_in_session);
       this.updateSubjects()
     }
   }

@@ -54,6 +54,7 @@ export class ScatterPlotService {
           .style('left','0px')
           .style('top','50px')
           .style('overflow',  'hidden')
+          .style('z-index',1)
           .call(D3.drag())
         //Create Zoom Section
         this.zoomSection = this.svg
@@ -215,7 +216,7 @@ export class ScatterPlotService {
                           '<mat-card-content style="font-size: 11px;"><div id="tooltip_content" style="text-align: justify; overflow-y:scroll; margin-right: -27px;padding-right:25px">' + d[tooltip_text] + '</div></mat-card-content>'
                         )
                         D3.select('#tooltip_content')
-                        .style('max-height', (window.innerHeight/2 - 107) + 'px')
+                        .style('max-height', (window.innerHeight/2 - 107).toFixed(0) + 'px')
                       //Hide other topics.
                       // d.topics.forEach((paperTopic)=>{
                       //   console.log(paperTopic);
