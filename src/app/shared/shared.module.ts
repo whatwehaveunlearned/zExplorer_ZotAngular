@@ -1,10 +1,14 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+// import {BrowserModule} from '@angular/platform-browser'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FlexLayoutModule } from '@angular/flex-layout';
 // import {MatGridListModule} from '@angular/material/grid-list';
 import {NavbarComponent} from './pages/navbar/navbar.component'
 import {DragDropModule} from '@angular/cdk/drag-drop';
+
+import { ColorSketchModule } from 'ngx-color/sketch';
+// import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import {
   MatButtonModule,
@@ -37,6 +41,9 @@ import {
 
 import { MatTableModule } from '@angular/material/table';
 import {MatTreeModule} from '@angular/material/tree';
+import {ClusterDialog} from '../shared/services/scatterplot.service'
+
+
 
 @NgModule({
   imports: [
@@ -45,12 +52,20 @@ import {MatTreeModule} from '@angular/material/tree';
     ReactiveFormsModule,
     FlexLayoutModule,
 
+    //Colorpicker
+    // BrowserModule,
+    ColorSketchModule,
+    // BrowserAnimationsModule,
+
+    
+
     // Material 
     MatButtonModule,
     MatButtonToggleModule,
     MatCardModule,
     MatCheckboxModule,
     MatChipsModule,
+    MatDialogModule,
     MatDividerModule,
     MatExpansionModule,
     MatFormFieldModule,
@@ -81,6 +96,9 @@ import {MatTreeModule} from '@angular/material/tree';
     ReactiveFormsModule,
     NavbarComponent,
     FlexLayoutModule,
+    ClusterDialog,
+
+    ColorSketchModule,
 
     // Material 
     MatButtonModule,
@@ -114,7 +132,9 @@ import {MatTreeModule} from '@angular/material/tree';
     MatTreeModule
   ],
   declarations: [
-    NavbarComponent
-  ]
+    NavbarComponent,
+    ClusterDialog,
+  ],
+  entryComponents: [ClusterDialog],
 })
 export class SharedModule { }

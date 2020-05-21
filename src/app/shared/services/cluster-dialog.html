@@ -1,0 +1,15 @@
+<h1 mat-dialog-title>Edit Cluster</h1>
+<div mat-dialog-content>
+
+  <p>New Cluster</p>
+  <p *ngFor= "let selected_paper of data.papers" style="font-size:small">{{selected_paper.title}}</p>
+  <mat-form-field>
+    <mat-label>Cluster Name</mat-label>
+    <input matInput [(ngModel)]="data.cluster.name">
+  </mat-form-field>
+</div>
+<color-sketch [color]="data.cluster.color" (onChangeComplete)="changeColor($event)"></color-sketch>
+<div mat-dialog-actions>
+  <button mat-button (click)="onNoClick()">No Thanks</button>
+  <button mat-button (click)="saveCluster()" [mat-dialog-close]="data.papers_selected" cdkFocusInitial>Save</button>
+</div>

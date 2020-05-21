@@ -10,6 +10,8 @@ import {SessionDashboardPageComponent} from './pages/session-dashboard-page/sess
 import { AuthorListComponent } from './components/author-list/author-list.component';
 import { PaperScatterplotComponent } from './components/paper-scatterplot/paper-scatterplot.component'
 
+
+
 @NgModule({
   declarations: [
     TopicViewerComponent,
@@ -18,9 +20,12 @@ import { PaperScatterplotComponent } from './components/paper-scatterplot/paper-
     SessionDashboardPageComponent,
     AuthorListComponent,
     PaperScatterplotComponent,
+    
   ],
   imports: [
     SharedModule,
+    //ClusterDialog Declared in scatterplot.service
+    // ClusterDialog
   ],
   exports: [
     TopicViewerComponent,

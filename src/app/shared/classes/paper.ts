@@ -34,6 +34,9 @@ export class Paper_Item {
     author1:string;
     author2:string;
     author3:string;
+    color:string;
+    cluster:string;
+    default_color:string;
 
     constructor(
         key,
@@ -94,5 +97,9 @@ export class Paper_Item {
         this.weight = 2;
         this.x = -1000000;
         this.y = -1000000;
+        this.default_color = '#43EFC4';
+        this.color = this.default_color;
+        this.cluster = "";
+        // if (this.new) this.color = '#FD5F00';
     }
 }

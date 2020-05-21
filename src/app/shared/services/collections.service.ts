@@ -91,19 +91,7 @@ export class CollectionsService {
       this.papers_to_add_to_session_updated.next(this.papers_to_add_to_session);
     })
   }
-
-  addPaperToSession(paper_list){
-    paper_list.forEach((element)=>{
-      let data = element
-      this.papers_in_session.push(element)
-      this.papers_in_session_updated.next(this.papers_in_session);
-    })
-    let message = {
-      'msg':paper_list,
-      'type':'add_papers'
-    }
-    this.socket.send(JSON.stringify(message))
-  }
+  
 
   isPaperInSession(ID){
     let this_paper = this.papers_in_session.filter(papers => papers.key === ID)[0]
@@ -137,13 +125,13 @@ export class CollectionsService {
       if(this_paper){
         this_paper.x = eval(document_collection['vec_2d'][listOfPapers[i]])[0];
         this_paper.y = eval(document_collection['vec_2d'][listOfPapers[i]])[1];
-        this_paper.abstract_text = document_collection['abstract'][listOfPapers[i]].split(' ').slice(1).join(' ')//Remove the word abstract:
+        this_paper.abstract_text = document_collection['abstract'][listOfPapers[i]].split('\n').slice(1).join('\n')//Remove the word abstract:
         this_paper.topics = topics[listOfPapers[i]]
       }else{
         let new_paper = new Paper_Item (document_collection['globalID'][listOfPapers[i]],document_collection['title'][listOfPapers[i]],'paper',document_collection['author'][listOfPapers[i]],document_collection['year'][listOfPapers[i]],'data.dateAdded','data.dateModified',document_collection['pdf_file'][listOfPapers[i]],'data.itemType', 'data.linkMode', 'data.md5', 'data.note_x', 'data.note_y', 'data.parentItem_x', 'data.parentItem_y',' data.pdf_file',document_collection['tags'][listOfPapers[i]],'data.tags_y')
         new_paper.x = eval(document_collection['vec_2d'][listOfPapers[i]])[0];
         new_paper.y = eval(document_collection['vec_2d'][listOfPapers[i]])[1];
-        new_paper.abstract_text = document_collection['abstract'][listOfPapers[i]].split(' ').slice(1).join(' ') //Remove the word abstract:
+        new_paper.abstract_text = document_collection['abstract'][listOfPapers[i]].split('\n').slice(1).join('\n') //Remove the word abstract:
         new_paper.topics = topics[listOfPapers[i]]
         new_paper.new = true
         this.papers_in_session.push(new_paper)
@@ -398,11 +386,36 @@ export class CollectionsService {
     // this.papers_in_session_updated.next(this.papers_in_session)
   }
 
+  //  COMUNICATIONS WITH SAGE SERVER  //
+
+  addPaperToSession(paper_list){
+    paper_list.forEach((element)=>{
+      let data = element
+      this.papers_in_session.push(element)
+      this.papers_in_session_updated.next(this.papers_in_session);
+    })
+    let message = {
+      'msg':paper_list,
+      'type':'add_papers'
+    }
+    this.socket.send(JSON.stringify(message))
+  }
+
+
   search_arxiv(){
     //Function to search additional papers in arxiv from sageBrain session
     let message = {
       'msg':{'papers':this.papers_in_session, 'topics':this.topics_in_session},
       'type':'search_arxiv'
+    }
+    this.socket.send(JSON.stringify(message))
+  }
+
+  addDocuments(){
+    //Function to add collections by steps for user study
+    let message = {
+      'msg':{'papers':this.papers_in_session, 'topics':this.topics_in_session},
+      'type':'add_next_documents_for_user_studies'
     }
     this.socket.send(JSON.stringify(message))
   }
@@ -415,7 +428,8 @@ export class CollectionsService {
     }
     this.socket.send(JSON.stringify(message))
   }
-  
+
+  // END  COMUNICATIONS WITH SAGE SERVER  //
 
   //Get Session Data
   getSessionPapers():Array<Paper_Item>{

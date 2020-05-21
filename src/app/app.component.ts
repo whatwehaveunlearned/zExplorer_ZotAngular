@@ -20,4 +20,8 @@ export class AppComponent {
   updateModel(){
     this.collectionsService.update_model();
   }
+
+  addDocuments(){
+    this.collectionsService.addDocuments();
+  }
 }
