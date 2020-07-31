@@ -1,5 +1,10 @@
+<button  *ngIf="not_started" class ='start-button' (click) = "startStudy()"  mat-raised-button > Start </button>
+<a class ='next-step-button' routerLink="'/comparison'"><button   (click) = "nextStep()" mat-button > Next </button></a>
 <mat-card id='paper_scatterplot_card'>
-
+    <div *ngIf="loading">
+        <p class="loading-text">Loading Documents</p>
+        <mat-spinner class="loading" ></mat-spinner>
+    </div>
     <div id='paper_tooltip'></div>
 
 </mat-card>

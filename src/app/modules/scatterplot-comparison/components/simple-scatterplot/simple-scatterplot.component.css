@@ -1,0 +1,57 @@
+svg{
+    width:90%;
+    height:100%;
+    position: relative;
+    left: 2rem;
+    border: 1px solid white;
+    border-radius: 12px;
+    margin-top:1rem;
+}
+
+.container{
+    height: 80%;
+}
+
+.tooltip{
+    position: absolute;
+    top: 120px;
+    width: 16rem;
+    left: 1rem;
+    border: 1px solid white;
+    border-radius: 12px;
+    padding: 1rem;
+    background: black;
+    opacity: 0.8;
+    display:none;
+    z-index:100;
+    max-height: 25rem;
+    overflow-y: scroll;
+}
+
+.options{
+    display: flex;
+    width: 100%;
+    align-content: center;
+    justify-content: center;
+    font-size: 30px;
+}
+
+::ng-deep .mat-radio-outer-circle{
+    border-color:white;
+}
+
+::ng-deep .mat-radio-label{
+    padding:1rem;
+}
+
+.loading{
+    position: relative;
+    left: 15.9rem;
+    top: -28rem;
+}
+
+.loading-text{
+    position: relative;
+    left: -3.1rem;
+    font-size: 27px;
+}

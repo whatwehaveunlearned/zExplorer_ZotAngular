@@ -87,42 +87,66 @@ export class ScatterPlotService {
                   //   .attr('transform',D3.event.transform)
       }
     
-    getMaxX(data) {
+    getMaxX(data,type?) {
         let data_elements = [];
         if(data){
+          if(type){
             data.forEach((input_data) => {
-                data_elements.push(input_data['x']);
-            });
+            data_elements.push(input_data['xUmap']);
+          });
+          }else{
+            data.forEach((input_data) => {
+            data_elements.push(input_data['x']);
+          });
+          }
             return D3.max(data_elements);
         }
     }
     
-    getMinX(data) {
+    getMinX(data,type?) {
         let data_elements = [];
         if(data){
+          if(type){
             data.forEach((input_data) => {
-                data_elements.push(input_data['x']);
-            });
+            data_elements.push(input_data['xUmap']);
+          });
+          }else{
+            data.forEach((input_data) => {
+            data_elements.push(input_data['x']);
+          });
+          }
             return D3.min(data_elements);
         }
     }
     
-    getMaxY(data) {
+    getMaxY(data,type?) {
         let data_elements = [];
         if(data){
+          if(type){
             data.forEach((input_data) => {
-                data_elements.push(input_data['y']);
-            });
+            data_elements.push(input_data['yUmap']);
+          });
+          }else{
+            data.forEach((input_data) => {
+            data_elements.push(input_data['y']);
+          });
+          }
             return D3.max(data_elements);
         }
     }
     
-    getMinY(data) {
+    getMinY(data,type?) {
         let data_elements = [];
         if(data){
+          if(type){
             data.forEach((input_data) => {
-                data_elements.push(input_data['y']);
-            });
+            data_elements.push(input_data['yUmap']);
+          });
+          }else{
+            data.forEach((input_data) => {
+            data_elements.push(input_data['y']);
+          });
+          }
             return D3.min(data_elements);
         }
     }

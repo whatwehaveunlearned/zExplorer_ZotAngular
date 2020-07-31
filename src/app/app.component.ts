@@ -17,11 +17,11 @@ export class AppComponent {
     this.collectionsService.search_arxiv();
   }
 
-  updateModel(){
-    this.collectionsService.update_model();
-  }
+  // updateModel(){
+  //   this.collectionsService.update_model();
+  // }
 
-  addDocuments(){
-    this.collectionsService.addDocuments();
-  }
+  // nextStep(){
+  //   this.collectionsService.update_model();
+  // }
 }

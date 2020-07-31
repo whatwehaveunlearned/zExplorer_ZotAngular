@@ -36,7 +36,7 @@ export class PaperListComponent implements OnInit {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
     //Subscribe to paper in session service
-    this.collectionsService.papers_in_session_updated.subscribe(newData =>{
+    this.collectionsService.papers_dashboard.subscribe(newData =>{
       this.data = newData;
       this.dataSource = new MatTableDataSource(this.data);
       this.dataSource.paginator = this.paginator;

@@ -35,7 +35,9 @@ export class CollectionsService {
   private papers_to_add_to_session = []
 
   //Dashboard Collections
-  public papers_in_session_updated: Subject<Array<Paper_Item>>
+  public papers_dashboard: Subject<Array<Paper_Item>>
+  public comparison_papers: Subject<Array<Paper_Item>>
+  private comparison_paper_array = []
   private papers_in_session = []
 
   public authors_in_session_updated : Subject<Array<Author>>
@@ -52,33 +54,38 @@ export class CollectionsService {
   
 
   constructor() {
+    //HardCoded Collections for User Study
+    const collection1 = 'DNUCZS2H'
     //Initialize the Subjects
     this.collections = new Subject<Array<Collection_Item>>()
     this.papers_in_active_collections_updated = new Subject<Array<Paper_Item>>()
     this.papers_to_add_to_session_updated = new Subject<Array<Paper_Item>>()
-    this.papers_in_session_updated = new Subject<Array<Paper_Item>>()
+    this.papers_dashboard = new Subject<Array<Paper_Item>>();
+    this.comparison_papers = new Subject<Array<Paper_Item>>()
     this.authors_in_session_updated = new Subject<Array<Author>>()
     this.topics_in_session_updated = new Subject<Array<Topic>>();
     this.words_in_session_updated = new Subject<Array<Word>>();
 
     this.sections_in_session_updated = new Subject<Array<DocumentSection>>();
+    // console.log(this.active_collections)
+    // let message = {
+    //   'msg':collection1,
+    //   'type':'collections'
+    // }
+    // this.socket.onopen = ((event)=> {
+    //   this.socket.send(JSON.stringify(message))
+
+    // })
+   }
+
+  startStudy(){
     //Create the communication socket
-    // this.socket = new WebSocket("ws://" + window.location.hostname + ":3000");
     this.socket = new WebSocket("ws://" + "0.0.0.0" + ":3000")
     this.socket.onmessage = ((event) => {
       //If we get data  
       this.recieved_data(event)
     })
-    this.active_collections.subscribe(selectedCollection =>{
-      console.log(this.active_collections)
-      let message = {
-        'msg':selectedCollection[0].key,
-        'type':'collections'
-      }
-      this.socket.send(JSON.stringify(message))
-    })
-
-   }
+  }
 
   addCollection(key:string,name:string,parentCollection:string){
     this.collection_items.push(new Collection_Item (key,name,parentCollection))
@@ -138,14 +145,31 @@ export class CollectionsService {
       }
     }
     //Update papers Subject
-    this.papers_in_session_updated.next(this.papers_in_session);
+    this.papers_dashboard.next(this.papers_in_session);
+  }
+
+  comparisonProcessPapers(documents_msg){
+    //Processed papers we highlight them and add the projected positions
+    let document_collection = JSON.parse(documents_msg)
+    let listOfPapers = Object.keys(document_collection['topics'])
+    for(let i=0; i < listOfPapers.length; i++){
+        let new_paper = new Paper_Item (document_collection['globalID'][listOfPapers[i]],document_collection['title'][listOfPapers[i]],'paper',document_collection['author'][listOfPapers[i]],document_collection['year'][listOfPapers[i]],'data.dateAdded','data.dateModified',document_collection['pdf_file'][listOfPapers[i]],'data.itemType', 'data.linkMode', 'data.md5', 'data.note_x', 'data.note_y', 'data.parentItem_x', 'data.parentItem_y',' data.pdf_file',document_collection['tags'][listOfPapers[i]],'data.tags_y')
+        new_paper.x = eval(document_collection['vec_2d'][listOfPapers[i]])[0];
+        new_paper.y = eval(document_collection['vec_2d'][listOfPapers[i]])[1];
+        new_paper.xUmap = eval(document_collection['vec_2d_UMAP'][listOfPapers[i]])[0];
+        new_paper.yUmap = eval(document_collection['vec_2d_UMAP'][listOfPapers[i]])[1];
+        new_paper.abstract_text = document_collection['abstract'][listOfPapers[i]].split('\n').slice(1).join('\n') //Remove the word abstract:
+        this.comparison_paper_array.push(new_paper)
+    }
+    //Update papers Subject
+    this.comparison_papers.next(this.comparison_paper_array);
   }
 
   //Update Subjects
   updateSubjects(){
     //Update Subjects
     this.topics_in_session_updated.next(this.topics_in_session)
-    this.papers_in_session_updated.next(this.papers_in_session)
+    this.papers_dashboard.next(this.papers_in_session)
     this.words_in_session_updated.next(this.words_in_session)
   }
 
@@ -223,13 +247,8 @@ export class CollectionsService {
           this.words_in_session.push(new Word(data.C,data.count,data.exemplar,data.pos,data.sigma_nor,data.topic,data.vector,data.vocab_index,data.word,data.x2D,data.y2D,data.threshold));
         }
       })
-
-      //Here I need to Add the Authors, Years and Topics
-      // this.papers_in_session = this.papers_to_add_to_session;
-      // this.papers_in_session.next(this.papers_to_add_to_session)
-
       //Map the papers to the specific session topics
-      this.mapTopicsToPapersNewData();
+      // this.mapTopicsToPapersNewData();
       console.log('order Topics by importance')
       this.orderByImportance(this.topics_in_session);
       console.log('order Papers by importance')
@@ -237,8 +256,11 @@ export class CollectionsService {
       this.updateSubjects()
     }else if(this.response.type==='update_model'){
       //Process Papers
-      this.processPapers(this.response.message.documents,this.topics_in_session);
-      this.updateSubjects()
+      // this.processPapers(this.response.message.documents,this.topics_in_session);
+      // this.updateSubjects()
+      this.addDocuments();
+    }else if(this.response.type==='Comparison_data'){
+      this.comparisonProcessPapers(this.response.message.documents);
     }
   }
 
@@ -264,7 +286,7 @@ export class CollectionsService {
         // }
       }
     }
-    this.papers_in_session_updated.next(this.papers_in_session)
+    this.papers_dashboard.next(this.papers_in_session)
   }
 
   mapTopicsToPapersNewData(){
@@ -324,19 +346,6 @@ export class CollectionsService {
       topic.weight = new_topic_weight;
       //push topic to proper position
       this.topics_in_session.splice(topic_index, 0, topic);
-      // //Get old words weights in topic
-      // let test_words_in_session = this.words_in_session
-      // let new_weights = []
-      // let words_object_from_session = []
-      // for(let word_index=0; word_index < words_in_topic.length; word_index++){
-      //   let selected_word = this.words_in_session.filter(words => words.word === words_in_topic[word_index])[0];
-      //   words_object_from_session.push(selected_word)
-      //   new_weights.push(selected_word.sigma_nor)
-      // }
-      // //Reasign new weights for words in topic
-      // this.reasign_weights(words_object_from_session,new_weights, new_topic_weight);
-      // //Recalculate topic weights
-      // // this.calculateTopicWeight()
     }else if(type=='cross'){
       //Delete topic from session
       this.topics_in_session = this.topics_in_session.filter(topics => topics.id !== topic.id)
@@ -347,14 +356,9 @@ export class CollectionsService {
     }
     //ReAssign topics to papers with new weights
     this.recalculateWeights();
-    //Reorder again Might be causing the problem replotting everythin
-    // this.orderByImportance(this.papers_in_session);
     this.orderByImportance(this.topics_in_session);
     //Update Subjects
-    this.topics_in_session_updated.next(this.topics_in_session)
-    this.papers_in_session_updated.next(this.papers_in_session)
-    this.words_in_session_updated.next(this.words_in_session)
-    console.log('Change importance')
+    this.updateSubjects()
   }
 
   reasign_weights(words, word_weights, new_topic_weight){
@@ -367,23 +371,14 @@ export class CollectionsService {
       // words[weight_index].sigma_nor = ( (word_weights[weight_index] - min) / (max - min) ) * new_topic_weight/word_weights.length;
       words[weight_index].sigma_nor = ( (word_weights[weight_index] - min) / (max - min) ) * new_topic_weight;
     }
-    console.log('here')
   }
 
   update_position(data,new_x,new_y){
-    // for( let i=0; i<this.papers_in_session.length; i++ ){
-
-    //   if ( this.papers_in_session[i].key === data.key ){
-    //     this.papers_in_session[i].x = new_x
-    //     this.papers_in_session[i].y = new_y
-    //   }
-    // }
     let paper = this.papers_in_session.filter(papers => papers.key === data.key)[0]
     this.papers_in_session = this.papers_in_session.filter(papers => papers.key !== data.key)
     paper.x = new_x
     paper.y = new_y
     this.papers_in_session.push(paper)
-    // this.papers_in_session_updated.next(this.papers_in_session)
   }
 
   //  COMUNICATIONS WITH SAGE SERVER  //
@@ -392,7 +387,7 @@ export class CollectionsService {
     paper_list.forEach((element)=>{
       let data = element
       this.papers_in_session.push(element)
-      this.papers_in_session_updated.next(this.papers_in_session);
+      this.papers_dashboard.next(this.papers_in_session);
     })
     let message = {
       'msg':paper_list,
@@ -416,6 +411,15 @@ export class CollectionsService {
     let message = {
       'msg':{'papers':this.papers_in_session, 'topics':this.topics_in_session},
       'type':'add_next_documents_for_user_studies'
+    }
+    this.socket.send(JSON.stringify(message))
+  }
+
+  nextCicle(){
+    //Function to start next cicle for user study
+    let message = {
+      'msg':{'papers':this.papers_in_session, 'topics':this.topics_in_session},
+      'type':'next_cicle'
     }
     this.socket.send(JSON.stringify(message))
   }

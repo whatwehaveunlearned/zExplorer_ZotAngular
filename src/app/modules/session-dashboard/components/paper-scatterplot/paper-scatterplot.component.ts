@@ -1,4 +1,5 @@
-import { Component, OnInit, ElementRef, OnChanges, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ElementRef, ChangeDetectorRef, OnDestroy } from '@angular/core';
+import { Router } from "@angular/router";
 // import {DragDropModule} from '@angular/cdk/drag-drop';
 
 import {CollectionsService} from '@app/shared/services/collections.service';
@@ -6,6 +7,7 @@ import {ScatterPlotService} from '@app/shared/services/scatterplot.service';
 import { Paper_Item } from '@app/shared/classes/paper';
 
 import * as D3 from 'd3';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-paper-scatterplot',
@@ -19,26 +21,34 @@ export class PaperScatterplotComponent implements OnInit {
   public xScale:d3.ScaleLinear<number,number>;
   public yScale:d3.ScaleLinear<number,number>;
   public zScale:d3.ScaleLinear<number,number>;
+  loading:boolean = false;
+  not_started:boolean = true;
+  dataSubscription:Subscription;
   
-  constructor(private collectionsService:CollectionsService,private _element: ElementRef, private scatterPlotService:ScatterPlotService) { }
+  constructor(private router: Router, private collectionsService:CollectionsService,private _element: ElementRef, private scatterPlotService:ScatterPlotService, private changeDetectorRef:ChangeDetectorRef) { }
 
   ngOnInit() {
   //Fetch data
     // this.data = this.collectionsService.getSessionWords();
     // this.data =  this.collectionsService.getSessionPapers();
+    // this.loading = true;
     this.setup();
     this.scatterPlotService.buildSVG('paper');
     if (this.data.length > 0){
       if(this.data['x'] !== -1000000){
+        this.loading = false;
         this.drawSvg();
       }
     }
     // this.host = D3.select(this._element.nativeElement);
     
     //Subscribe
-    this.collectionsService.papers_in_session_updated.subscribe(newData =>{
+    this.dataSubscription = this.collectionsService.papers_dashboard.subscribe(newData =>{
       this.data = newData;
       if(this.data['x'] !== -1000000){
+        this.not_started = false;
+        this.loading = false;
+        this.changeDetectorRef.detectChanges();
         this.drawSvg();
       }
     })
@@ -54,6 +64,30 @@ export class PaperScatterplotComponent implements OnInit {
     this.scatterPlotService.populate('paper',this.data,'key','weight',this.xScale,this.yScale,this.zScale,'title','author1','author2','author3','abstract_text');
     // this.scatterPlotService.drawXAxis();
     // this.scatterPlotService.drawYAxis();
+  }
+
+  startStudy(){
+    this.not_started = false;
+    this.loading =true;
+    this.collectionsService.startStudy();
+  }
+
+  nextStep(){
+    this.loading = true;
+    this.changeDetectorRef.detectChanges();
+    this.collectionsService.update_model();
+    // this.collectionsService.addDocuments();
+    this.router.navigate(['/comparison']).then(e => {
+      if (e) {
+        console.log("Navigation is successful!");
+      } else {
+        console.log("Navigation has failed!");
+      }
+    });
+  }
+
+  ngOnDestroy(){
+    this.dataSubscription.unsubscribe();
   }
 
   // resetZoom(){

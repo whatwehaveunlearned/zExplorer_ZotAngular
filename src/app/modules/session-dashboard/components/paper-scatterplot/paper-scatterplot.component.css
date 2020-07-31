@@ -25,4 +25,34 @@
     
   ::ng-deep  .axis text{
       stroke: #FFFFFF;
-    }  
+    }
+    
+  .loading{
+    position: absolute;
+    top:20%;
+    left:45%;
+  }
+
+  .loading-text{
+    color: white;
+    position: absolute;
+    top: 11%;
+    font-size: 36px;
+    left: 37%;
+  }
+
+  .next-step-button{
+    position: absolute;
+    top: 14px;
+    right: 0px;
+  }
+
+  .start-button{
+    position: absolute;
+    top: 45%;
+    left: 31%;
+    width: 40%;
+    height: 20%;
+    font-size: 49px;
+    border-radius: 12px;
+  }

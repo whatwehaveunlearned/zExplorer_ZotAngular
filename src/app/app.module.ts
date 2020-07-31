@@ -17,6 +17,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import {CollectionsService} from '@app/shared/services/collections.service';
 
+import {ScatterplotComparisonModule} from '@app/modules/scatterplot-comparison/scatterplot-comparison.module'
+
 
 @NgModule({
   imports: [
@@ -28,6 +30,7 @@ import {CollectionsService} from '@app/shared/services/collections.service';
     PagesModule,
     ZoteroImporterModule,
     SessionDashboardModule,
+    ScatterplotComparisonModule
   ],
   declarations: [
     AppComponent,

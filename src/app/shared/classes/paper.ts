@@ -37,6 +37,8 @@ export class Paper_Item {
     color:string;
     cluster:string;
     default_color:string;
+    xUmap:number;
+    yUmap:number;
 
     constructor(
         key,
@@ -59,12 +61,16 @@ export class Paper_Item {
         tags_y,
         )
         {
-        year = year.toString()
+        if (year){
+            year = year.toString()
+        }else{
+            year = '';
+        }
         this.key = key;
         this.title = title;
         this.contentType = contentType;
         this.creators = creators;
-        if (this.creators.length>0){
+        if (this.creators && this.creators.length>0){
             if (creators[0]) this.author1 = creators[0].firstName[0] + '. ' + creators[0].lastName;
             else this.author1 = '-'
             if (creators[1]) this.author2 = creators[1].firstName[0] + '. ' + creators[1].lastName;
