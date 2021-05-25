@@ -57,7 +57,7 @@ export class PaperScatterplotComponent implements OnInit {
   setup(){
     this.xScale =  D3.scaleLinear().range([0, this.width]);
     this.yScale = D3.scaleLinear().range([this.height,0]);
-    this.zScale = D3.scaleLinear().range([5,20]);
+    this.zScale = D3.scaleLinear().range([15,15]);
   }
 
   drawSvg(){

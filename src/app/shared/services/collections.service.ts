@@ -122,7 +122,7 @@ export class CollectionsService {
     return [...this.authors_in_session]
   }
 
-  processPapers(documents_msg,topics){
+  processPapers(documents_msg){
     //Processed papers we highlight them and add the projected positions
     let document_collection = JSON.parse(documents_msg)
     let listOfPapers = Object.keys(document_collection['topics'])
@@ -132,14 +132,18 @@ export class CollectionsService {
       if(this_paper){
         this_paper.x = eval(document_collection['vec_2d'][listOfPapers[i]])[0];
         this_paper.y = eval(document_collection['vec_2d'][listOfPapers[i]])[1];
+        this_paper.originalX = this_paper.x
+        this_paper.originalY = this_paper.y
         this_paper.abstract_text = document_collection['abstract'][listOfPapers[i]].split('\n').slice(1).join('\n')//Remove the word abstract:
-        this_paper.topics = topics[listOfPapers[i]]
+        // this_paper.topics = topics[listOfPapers[i]]
       }else{
         let new_paper = new Paper_Item (document_collection['globalID'][listOfPapers[i]],document_collection['title'][listOfPapers[i]],'paper',document_collection['author'][listOfPapers[i]],document_collection['year'][listOfPapers[i]],'data.dateAdded','data.dateModified',document_collection['pdf_file'][listOfPapers[i]],'data.itemType', 'data.linkMode', 'data.md5', 'data.note_x', 'data.note_y', 'data.parentItem_x', 'data.parentItem_y',' data.pdf_file',document_collection['tags'][listOfPapers[i]],'data.tags_y')
         new_paper.x = eval(document_collection['vec_2d'][listOfPapers[i]])[0];
         new_paper.y = eval(document_collection['vec_2d'][listOfPapers[i]])[1];
+        new_paper.originalX = new_paper.x
+        new_paper.originalY = new_paper.y
         new_paper.abstract_text = document_collection['abstract'][listOfPapers[i]].split('\n').slice(1).join('\n') //Remove the word abstract:
-        new_paper.topics = topics[listOfPapers[i]]
+        // new_paper.topics = topics[listOfPapers[i]]
         new_paper.new = true
         this.papers_in_session.push(new_paper)
       }
@@ -152,6 +156,7 @@ export class CollectionsService {
     //Processed papers we highlight them and add the projected positions
     let document_collection = JSON.parse(documents_msg)
     let listOfPapers = Object.keys(document_collection['topics'])
+    this.comparison_paper_array = []
     for(let i=0; i < listOfPapers.length; i++){
         let new_paper = new Paper_Item (document_collection['globalID'][listOfPapers[i]],document_collection['title'][listOfPapers[i]],'paper',document_collection['author'][listOfPapers[i]],document_collection['year'][listOfPapers[i]],'data.dateAdded','data.dateModified',document_collection['pdf_file'][listOfPapers[i]],'data.itemType', 'data.linkMode', 'data.md5', 'data.note_x', 'data.note_y', 'data.parentItem_x', 'data.parentItem_y',' data.pdf_file',document_collection['tags'][listOfPapers[i]],'data.tags_y')
         new_paper.x = eval(document_collection['vec_2d'][listOfPapers[i]])[0];
@@ -189,69 +194,70 @@ export class CollectionsService {
       })
 		}else if(this.response.type==='sageBrain_data'){
       //Parse Topic Message
-      let topic_message = JSON.parse(this.response.message.doc_topics.topic_params)
+      // let topic_message = JSON.parse(this.response.message.doc_topics.topic_params)
 
       //Process Papers
-      this.processPapers(this.response.message.documents,topic_message)      
+      // this.processPapers(this.response.message.documents,topic_message)
+      this.processPapers(this.response.message.documents)      
       
       // //Update sections Subject
       // this.sections_in_session_updated.next(this.sections_in_session);
       
       //Update Topics
-      let collection_topics_order = this.response.message.doc_topics.order;
-      let collection_topics = JSON.parse(this.response.message.doc_topics.topics);
-      let topic_weigts = topic_message["weight"];
-      let response_topics_length = collection_topics_order.length - 1;
-      //Store previous topics to update the ones that stay with the new words
-      let topics_previous = this.topics_in_session;
-      //Clear topics
-      this.topics_in_session = [];
-      collection_topics_order.forEach((position,index)=>{
-        if(position!== "pos"){
-          let data:Array<any> = Object.values(collection_topics[position]).filter(word => word !== null);
-          let topic_exemplar = [];
-          //Get first exemplar to check
-          for(let word_topic_index=0 ; word_topic_index < data.length;word_topic_index++){
-            if (data[word_topic_index].split('*').length > 1){
-              if(topic_exemplar.length === 0) topic_exemplar.push(data[word_topic_index].split('*')[0])
-            }
-          }
-          this.topics_in_session.push(new Topic(index, position, collection_topics[position], topic_weigts[index]));
-          //Push data to subject once its completely uploaded
-          if(response_topics_length === index){
-            this.topics_in_session_updated.next(this.topics_in_session);
-          } 
-        }
+      // let collection_topics_order = this.response.message.doc_topics.order;
+      // let collection_topics = JSON.parse(this.response.message.doc_topics.topics);
+      // // let topic_weigts = topic_message["weight"];
+      // let response_topics_length = collection_topics_order.length - 1;
+      // //Store previous topics to update the ones that stay with the new words
+      // let topics_previous = this.topics_in_session;
+      // //Clear topics
+      // this.topics_in_session = [];
+      // collection_topics_order.forEach((position,index)=>{
+      //   if(position!== "pos"){
+      //     let data:Array<any> = Object.values(collection_topics[position]).filter(word => word !== null);
+      //     let topic_exemplar = [];
+      //     //Get first exemplar to check
+      //     for(let word_topic_index=0 ; word_topic_index < data.length;word_topic_index++){
+      //       if (data[word_topic_index].split('*').length > 1){
+      //         if(topic_exemplar.length === 0) topic_exemplar.push(data[word_topic_index].split('*')[0])
+      //       }
+      //     }
+      //     this.topics_in_session.push(new Topic(index, position, collection_topics[position], topic_weigts[index]));
+      //     //Push data to subject once its completely uploaded
+      //     if(response_topics_length === index){
+      //       this.topics_in_session_updated.next(this.topics_in_session);
+      //     } 
+      //   }
 
-      })
-      let collection_words = JSON.parse(this.response.message.doc_topics.words)
-      let response_length = collection_words.length - 1
-      collection_words.forEach((element,index)=>{
-        let data = element
-        //Check  if word is already in session
-        let word_in_collection = this.words_in_session.filter(words => words.word === data.word)
-        if(word_in_collection.length > 0){
-          //Update word in session
-          word_in_collection[0].C = data.C
-          word_in_collection[0].count = data.count
-          word_in_collection[0].exemplar = data.exemplar
-          word_in_collection[0].pos = data.pos
-          word_in_collection[0].sigma_nor = data.sigma_nor
-          word_in_collection[0].topic = data.topic
-          word_in_collection[0].vector = data.vector
-          word_in_collection[0].vocab_index = data.vocab_index
-          word_in_collection[0].x = data.x2D
-          word_in_collection[0].y = data.y2D
-        }else{
-          //add word to session
-          this.words_in_session.push(new Word(data.C,data.count,data.exemplar,data.pos,data.sigma_nor,data.topic,data.vector,data.vocab_index,data.word,data.x2D,data.y2D,data.threshold));
-        }
-      })
+      // })
+      // let collection_words = JSON.parse(this.response.message.doc_topics.words)
+      // let response_length = collection_words.length - 1
+      // collection_words.forEach((element,index)=>{
+      //   let data = element
+      //   //Check  if word is already in session
+      //   let word_in_collection = this.words_in_session.filter(words => words.word === data.word)
+      //   if(word_in_collection.length > 0){
+      //     //Update word in session
+      //     word_in_collection[0].C = data.C
+      //     word_in_collection[0].count = data.count
+      //     word_in_collection[0].exemplar = data.exemplar
+      //     word_in_collection[0].pos = data.pos
+      //     word_in_collection[0].sigma_nor = data.sigma_nor
+      //     word_in_collection[0].topic = data.topic
+      //     word_in_collection[0].vector = data.vector
+      //     word_in_collection[0].vocab_index = data.vocab_index
+      //     word_in_collection[0].x = data.x2D
+      //     word_in_collection[0].y = data.y2D
+      //   }else{
+      //     //add word to session
+      //     this.words_in_session.push(new Word(data.C,data.count,data.exemplar,data.pos,data.sigma_nor,data.topic,data.vector,data.vocab_index,data.word,data.x2D,data.y2D,data.threshold));
+      //   }
+      // })
       //Map the papers to the specific session topics
       // this.mapTopicsToPapersNewData();
-      console.log('order Topics by importance')
-      this.orderByImportance(this.topics_in_session);
-      console.log('order Papers by importance')
+      // console.log('order Topics by importance')
+      // this.orderByImportance(this.topics_in_session);
+      // console.log('order Papers by importance')
       // this.orderByImportance(this.papers_in_session);
       this.updateSubjects()
     }else if(this.response.type==='update_model'){
@@ -426,6 +432,10 @@ export class CollectionsService {
 
   update_model(){
     //Function to update model using Encoder in sageBrain session to mimic user input
+    //Calculate how much each document was moved
+    this.papers_in_session.forEach((element)=>{
+      element.distance_moved = Math.sqrt(((element.originalX - element.x) * (element.originalX - element.x)) + ((element.originalY - element.y) * (element.originalY - element.y)))
+    })
     let message = {
       'msg':{'papers':this.papers_in_session},
       'type':'update_model'

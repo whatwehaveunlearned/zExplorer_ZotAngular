@@ -92,7 +92,7 @@ export class SimpleScatterplotComponent implements OnChanges {
                                  .attr('cx', (d) => this.xScale(d[this.x_value]))
                                  .attr('cy', (d) => this.yScale(d[this.y_value]))
                                  .attr('r', (d) => this.zScale(d['weight']))
-                                 .style('fill','#4666FF')
+                                 .style('fill',(d) => d.color)
                                  .on('mouseover', (d) => {
                                     D3.selectAll('.' + 'class_'+ d.key)
                                       .transition()
@@ -118,7 +118,7 @@ export class SimpleScatterplotComponent implements OnChanges {
                                         .style('fill', (d:any) => {
                                           let color;
                                           color = '#4666FF';
-                                          return color;
+                                          return d.color;
                                         })
                                         .style('opacity',this.circle_opacity) 
                                   })

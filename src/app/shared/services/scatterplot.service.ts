@@ -1,4 +1,4 @@
-import { Injectable, AfterViewInit, HostListener, Inject,Component  } from '@angular/core';
+import { Injectable, AfterViewInit, HostListener, Inject,Component, ViewChild, ChangeDetectorRef  } from '@angular/core';
 import {CollectionsService} from '@app/shared/services/collections.service';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 
@@ -34,6 +34,8 @@ export class ScatterPlotService {
     public circle_opacity = 0.5;
     private circle_stroke_color = '#43EFC4';
     private cluster_array = [];
+    xScale;
+    yScale;
 
     constructor(private collectionsService:CollectionsService,public dialog: MatDialog){ }
     
@@ -173,6 +175,8 @@ export class ScatterPlotService {
     
     populate(type, data, identifier:string, data_size:string, XScale, YScale, ZScale ,tooltip_title,tooltip_subtitle0,tooltip_subtitle1,tooltip_subtitle2,tooltip_text){
       this.data = data;
+      this.xScale = XScale;
+      this.yScale = YScale;
        this.svg =  D3.select('#' + type + '_scatterplot_svg').call(D3Zoom.zoom()
             // .translateExtent([[20, 20], [400, 400]])
             .extent([[20, 20], [400, 400]])
@@ -260,12 +264,12 @@ export class ScatterPlotService {
                       }else{
                         D3.select('.' + type +'tooltip')
                           .html(
-                            '<mat-card-header><div style="text-align: right;">' + d[data_size].toFixed(0) +'</div>' +
+                              '<div id="cluster_buttons"><button mat-button id="edit_cluster_button">Edit Cluster</button></div>' +
+                              '<mat-card-header><div style="text-align: right;">' + d[data_size].toFixed(0) +'</div>' +
                               '<mat-card-title id: "tooltip_title" class:"mat-card-title style="font-size: 14px;"> <b>'  +  d[tooltip_title] + '</b> </mat-card-title> <br> <br>' +
                               '<mat-card-subtitle style="font-size: 13px;">' + d[tooltip_subtitle0] + '; ' + d[tooltip_subtitle1] + '; ' + d[tooltip_subtitle2] + '</mat-card-subtitle> ' +
                               '</mat-card-header> <br> <br>' +
-                              '<mat-card-content style="font-size: 11px;"><div id="tooltip_content" style="text-align: justify; overflow-y:scroll; margin-right: -27px;padding-right:25px">' + d[tooltip_text] + '</div></mat-card-content>' +
-                              '<div id="cluster_buttons"><button mat-button id="edit_cluster_button"><mat-icon>edit</mat-icon></button></div>'
+                              '<mat-card-content style="font-size: 11px;"><div id="tooltip_content" style="text-align: justify; overflow-y:scroll; margin-right: -27px;padding-right:25px">' + d[tooltip_text] + '</div></mat-card-content>'
                               )
                           .on('click', (d) => { this.editCluster(this.selected_data,XScale,YScale)})
                       }
@@ -323,26 +327,8 @@ export class ScatterPlotService {
                   //We make the selection
                   let data_point = D3.select('#id_'+d.key)
                   
-                  //We style selection and add or delete class
-                  if(data_point.attr('class').split(' ').includes("data_selected")){
-                    data_point.style('stroke',null)
-                      .classed('data_selected',false)
-                    //Remove from selection array
-                    this.selected_data = this.selected_data.filter(papers => papers.key !== data_point.attr('id').split('_')[1])
-                  }else{
-                    data_point.style('stroke','white')
-                      .style('stroke-width','4')
-                      .classed('data_selected',true)
-                    //If first selected data show menu
-                    if(this.selected_data.length === 0){
-                      //Tooltip Add footer buttons
-                      D3.select('#cluster_buttons')
-                        .html('<button mat-button id="edit_cluster_button><mat-icon>edit</mat-icon></button>')
-                        .on('click', (d) => { this.editCluster(this.selected_data,XScale,YScale)})
-                    }
-                    //Store in selection array
-                    this.selected_data.push(data.filter(papers => papers.key === data_point.attr('id').split('_')[1])[0])
-                  }
+                  this.selectDoc(data_point);
+                  
                   // test = this.selected_data
                   // console.log('test')
                   this.svg.style('pointer-events','auto')
@@ -370,10 +356,17 @@ export class ScatterPlotService {
                 });
               })
         //NEW POINTS UPDATE
+        //Setime out for setting pointer events so that they can not be hovered until finished positioning
+        setTimeout(() => {
+          this.points.transition()
+          .style('pointer-events','auto')
+          .style('cursor','pointer')
+        },6000);
         //Needs setTimeout for animation to be called
         setTimeout(() => {
         console.log(this.points)
         this.points.transition().duration(5000)
+        .style('pointer-events','none')
         .attr('id', (d) => 'id_' + d['key'])
                 .attr('class',(d) => {
                     let class_type;
@@ -397,7 +390,8 @@ export class ScatterPlotService {
           return color;
         })
         .style('opacity', this.circle_opacity)
-        .style('cursor','pointer');
+        // .style('pointer-events','auto')
+        // .style('cursor','pointer')
 
           
         new_points
@@ -436,6 +430,30 @@ export class ScatterPlotService {
         })
       }
     }
+    //Select document
+    selectDoc(data_point){
+      //We style selection and add or delete class
+      if(data_point.attr('class').split(' ').includes("data_selected")){
+        data_point.style('stroke',null)
+          .classed('data_selected',false)
+        //Remove from selection array
+        this.selected_data = this.selected_data.filter(papers => papers.key !== data_point.attr('id').split('_')[1])
+      }else{
+        data_point.style('stroke','white')
+          .style('stroke-width','4')
+          .classed('data_selected',true)
+        //If first selected data show menu
+        if(this.selected_data.length === 0){
+          //Tooltip Add footer buttons
+          D3.select('#cluster_buttons')
+            .html('<button mat-button id="edit_cluster_button><mat-icon>edit</mat-icon></button>')
+            .on('click', (d) => { this.editCluster(this.selected_data,this.xScale,this.yScale)})
+        }
+        //Store in selection array
+        this.selected_data.push(this.data.filter(papers => papers.key === data_point.attr('id').split('_')[1])[0])
+      }
+    }
+
     //FUNCTIONS THAT MANAGE DRAGGING
     dragstarted(d){
       //This is done to allow unselected points to move with selection
@@ -500,6 +518,20 @@ export class ScatterPlotService {
         .attr('y',YScale(position[1]))
         .style('fill',cluster.color)
         .text (cluster.name)
+        .on("contextmenu",  (d) => {
+          //To avoid default left click functionality
+          D3.event.preventDefault();
+          //Clear Selections
+          this.selected_data = [];
+          cluster.papers.forEach(element =>{
+            // this.selected_data.push(element.key);
+            let data_point = D3.select('#id_' + element.key)
+            data_point.style('stroke',null)
+                      .classed('data_selected',false)
+            this.selectDoc(data_point);
+            console.log()
+          })
+        })
     }
   
     //Edit Cluster Function
@@ -524,39 +556,71 @@ export class ScatterPlotService {
       let test = this.cluster_array;
       //If cluster is stored Assign to cluster Array
       if (result !== undefined){
-        //Create Cluster
-        let cluster = new Cluster(result.cluster_name,result.cluster_papers,result.cluster_color)
-        //If it exits awe clear the papers and assign again
-        let previous_cluster:Cluster = this.cluster_array.filter(this_cluster => this_cluster.name === result.cluster_name)[0]
-        if(previous_cluster){
-          //Clear previuous clusters in paper
-          previous_cluster.papers.forEach(element =>{
+        if(result.clear){
+          //Clear cluster tag
+          D3.select('#' + 'lablel_' + result.cluster_name.split(' ').join('_')).remove();
+          //Clear cluster papers
+          result.cluster_papers.forEach(element =>{
             element.cluster = "";
+            element.color = this.circle_color;
             //Clear color
             D3.select('#id_' + element.key)
-              .style('fill',element.default_color)
+              .style('fill',element.color)
           })
+          //Clear cluster from array
+          this.cluster_array = this.cluster_array.filter(cluster => cluster.name !== result.cluster_name)
+        }else{
+          //Create Cluster
+          let cluster = new Cluster(result.cluster_name,result.cluster_papers,result.cluster_color)
+          //If it exits awe clear the papers and assign again
+          let previous_cluster:Cluster = this.cluster_array.filter(this_cluster => this_cluster.name === result.cluster_name)[0]
+          if(previous_cluster){
+            //Clear previuous clusters in paper
+            previous_cluster.papers.forEach(element =>{
+              element.cluster = "";
+              element.color = this.circle_color;
+              //Clear color
+              D3.select('#id_' + element.key)
+                .style('fill',element.color)
+            })
+            //Clear previous cluster tag
+            D3.select('#lablel_' + cluster.name.split(' ').join('_')).remove();
+          }
+          //Here its deleted if existed and changed with the new if not only the new is pushed
+          this.cluster_array = this.cluster_array.filter(cluster => cluster.name !== result.cluster_name)
+          this.cluster_array.push(cluster)
+          //Store Cluster in paper
+          result.cluster_papers.forEach(element =>{
+            element.cluster = cluster.name;
+            element.color = cluster.color;
+            D3.select('#id_' + element.key)
+            .style('fill',cluster.color)
+          })
+          let position = cluster.lablePosition()
+          D3.select('#lablel_' + cluster.name.split(' ').join('_'))
+            .remove()
+          D3.select('#paperzoom_section')
+            .append('text')
+            .attr('id','lablel_' + cluster.name.split(' ').join('_'))
+            .attr('x',xScale(position[0]))
+            .attr('y',yScale(position[1]))
+            .style('fill',cluster.color)
+            .text (cluster.name)
+            .on("contextmenu",  (d) => {
+              //To avoid default left click functionality
+              D3.event.preventDefault();
+              //Clear Selections
+              this.selected_data = [];
+              result.cluster_papers.forEach(element =>{
+                // this.selected_data.push(element.key);
+                let data_point = D3.select('#id_' + element.key)
+                data_point.style('stroke',null)
+                          .classed('data_selected',false)
+                this.selectDoc(data_point);
+                console.log()
+              })
+            })
         }
-        //Here its deleted if existed and changed with the new if not only the new is pushed
-        this.cluster_array = this.cluster_array.filter(cluster => cluster.name !== result.cluster_name)
-        this.cluster_array.push(cluster)
-        //Store Cluster in paper
-        result.cluster_papers.forEach(element =>{
-          element.cluster = cluster.name;
-          element.color = cluster.color;
-          D3.select('#id_' + element.key)
-          .style('fill',cluster.color)
-        })
-        let position = cluster.lablePosition()
-        D3.select('#lablel_' + cluster.name.split(' ').join('_'))
-          .remove()
-        D3.select('#paperzoom_section')
-          .append('text')
-          .attr('id','lablel_' + cluster.name.split(' ').join('_'))
-          .attr('x',xScale(position[0]))
-          .attr('y',yScale(position[1]))
-          .style('fill',cluster.color)
-          .text (cluster.name)
       }
       //Set the dots without a cluster back to original color
       // D3.select(
@@ -567,31 +631,79 @@ export class ScatterPlotService {
 @Component({
   selector: 'cluster-dialog',
   templateUrl: 'cluster-dialog.html',
+  styleUrls: ['cluster-dialog.css']
 })
 
 export class ClusterDialog{
 
+  original_data_name;
+  original_data_color = '#43EFC4';
+  clear:boolean=false;
+  @ViewChild('colorBox') colorBox;
+
   constructor(
+    private changeDetectorRef: ChangeDetectorRef, 
     public dialogRef: MatDialogRef<ClusterDialog>,
-    @Inject(MAT_DIALOG_DATA) public data: ClusterDialogData) {}
+    @Inject(MAT_DIALOG_DATA) public data: ClusterDialogData) {
+      this.original_data_name = this.data.cluster.name
+      this.original_data_color = this.data.cluster.color
+    }
 
   onNoClick(): void {
-    this.dialogRef.close({'cluster_name':this.data.cluster.name,'cluster_papers':this.data.papers,'cluster_color':this.data.cluster.color});
+    if(this.original_data_name.length > 0) {
+     this.dialogRef.close({'cluster_name':this.original_data_name,'cluster_papers':this.data.papers,'cluster_color':this.data.cluster.color});
+    }else{
+      //If cancel set back original colors
+      D3.selectAll('.data_selected')
+      .style('fill',this.original_data_color)
+      this.data.papers.forEach(element =>{
+        element.color = this.original_data_color;
+      })
+      this.dialogRef.close(undefined);
+    }
   }
+
+  // changeColor(){
+  //   D3.selectAll('.data_selected')
+  //     .style('fill',this.data.cluster.color)
+    
+  //   this.data.papers.forEach(element =>{
+  //     element.color = this.data.cluster.color;
+  //   })
+  // }
 
   changeColor(event){
     this.data.cluster.color = event.color.hex;
+    this.colorBox.nativeElement.style['background'] = this.data.cluster.color; 
+    this.changeDetectorRef.detectChanges();
+    // D3.selectAll('.data_selected')
+    //   .style('fill',event.color.hex)
+    
+    // this.data.papers.forEach(element =>{
+    //   element.color = event.color.hex;
+    // })
+  }
+
+  applyColor(){
     D3.selectAll('.data_selected')
-      .style('fill',event.color.hex)
+      .style('fill',this.data.cluster.color)
     
     this.data.papers.forEach(element =>{
-      element.color = event.color.hex;
+      element.color = this.data.cluster.color;
     })
   }
 
+  deleteCluster(){
+    this.data.cluster.name = this.original_data_name;
+    this.data.cluster.color = this.original_data_color;
+    this.clear = true;
+    this.saveCluster();
+  }
+
   saveCluster(){
+    this.applyColor();
     //We send the value back to scatterplot
-    this.dialogRef.close({'cluster_name':this.data.cluster.name,'cluster_papers':this.data.papers,'cluster_color':this.data.cluster.color})
+    this.dialogRef.close({'cluster_name':this.data.cluster.name,'cluster_papers':this.data.papers,'cluster_color':this.data.cluster.color,'clear':this.clear})
   }
 
 }

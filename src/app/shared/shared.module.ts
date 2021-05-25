@@ -7,7 +7,7 @@ import { FlexLayoutModule } from '@angular/flex-layout';
 import {NavbarComponent} from './pages/navbar/navbar.component'
 import {DragDropModule} from '@angular/cdk/drag-drop';
 
-import { ColorSketchModule } from 'ngx-color/sketch';
+import { ColorGithubModule } from 'ngx-color/github';
 // import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import {
@@ -54,7 +54,7 @@ import {ClusterDialog} from '../shared/services/scatterplot.service'
 
     //Colorpicker
     // BrowserModule,
-    ColorSketchModule,
+    ColorGithubModule,
     // BrowserAnimationsModule,
 
     
@@ -98,7 +98,7 @@ import {ClusterDialog} from '../shared/services/scatterplot.service'
     FlexLayoutModule,
     ClusterDialog,
 
-    ColorSketchModule,
+    ColorGithubModule,
 
     // Material 
     MatButtonModule,

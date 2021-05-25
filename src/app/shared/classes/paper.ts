@@ -39,7 +39,9 @@ export class Paper_Item {
     default_color:string;
     xUmap:number;
     yUmap:number;
-
+    distance_moved:number = 0;
+    originalX:number = 0;
+    originalY:number = 0;
     constructor(
         key,
         title,
